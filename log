@@ -1,0 +1,23 @@
+// alocate volume
+mkdir solrdata
+solr sudo chown 8983:8983 solrdata
+
+// run docker and link to privileged volume
+docker run --name solr_pres -v "$PWD/solrdata:/var/solr" -d -p 8983:8983 -t solr
+
+// enter solr terminal
+docker exec -it solr_pres /bin/bash
+
+// create core "sandbox"
+bin/solr create_core -c sandbox
+
+// ls ../../var/solr -> volume directory
+// curl data to inject
+curl 'https://raw.githubusercontent.com/hectorcorrea/solr-for-newbies/master/books.json' > ../../var/solr/books.json
+
+// ./bin/post -> POST helper directory
+// POST json
+./bin/post -c sandbox ../../var/solr/books.json
+
+// select all results
+curl http://localhost:8983/solr/sandbox/select\?indent\=true\&q.op\=OR\&q\=\*%3A\*
