@@ -1,0 +1,22 @@
+// import data
+curl 'https://raw.githubusercontent.com/hectorcorrea/solr-for-newbies/master/books.json' > books.json ;
+
+// run docker and link to privileged volume
+docker run --name solr_pres -d -p 8983:8983 -t solr ;
+
+// create core "sandbox"
+docker exec -it solr_pres bin/solr create_core -c sandbox ;
+// should be possible to do from http : https://cwiki.apache.org/confluence/display/solr/CoreAdmin#CREATE
+//curl http://localhost:8983/solr/admin/cores\?action\=CREATE\&name\=core_name\&numShards\=2\&replicationFactor\=2 
+
+// show cores
+curl http://localhost:8983/solr/admin/cores\?action\=STATUS ;
+
+// Update data to solr
+curl 'http://localhost:8983/solr/sandbox/update?commit=true' --data-binary @books.json -H 'Content-type:application/json' ;
+
+// Read everything in a core
+curl 'http://localhost:8983/solr/sandbox/select?q=*:*' ;
+
+// Delete everything in a core
+curl 'http://localhost:8983/solr/sandbox/update?commit=true' --data '<delete><query>*:*</query></delete>' ;
