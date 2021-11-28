@@ -51,3 +51,7 @@ curl http://localhost:8983/solr/sandbox/select?indent=true\&q.op=OR\&q=id%3A0000
 
 echo "Delete Samuel Herbert"
 curl 'http://localhost:8983/solr/sandbox/update?commit=true' --data '<delete><query>id:00000002</query></delete>' ;
+
+
+echo "Show matchs where subjects_txts_en=Geography and count results by publisher_txt_en with facet"
+curl http://localhost:8983/solr/sandbox/select?facet.field=publisher_txt_en&facet=true&indent=true&q.op=OR&q=subjects_txts_en%3AGeography
