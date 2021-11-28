@@ -18,6 +18,14 @@ curl 'http://localhost:8983/solr/sandbox/update?commit=true' --data-binary @book
 // Read everything in a core
 curl 'http://localhost:8983/solr/sandbox/select?q=*:*' ;
 
+// explain fields.txt
+// static id field given
+curl localhost:8983/solr/sandbox/schema/fields/id
+
+// dynamic _txt_en field given for title and etc
+curl localhost:8983/solr/sandbox/schema/dynamicfields/\*_txt_en
+curl localhost:8983/solr/sandbox/schema/fieldtypes/text_en
+
 // Delete everything in a core
 curl 'http://localhost:8983/solr/sandbox/update?commit=true' --data '<delete><query>*:*</query></delete>' ;
 
@@ -43,6 +51,9 @@ curl http://localhost:8983/solr/sandbox/select?indent=true\&q.op=OR\&q=id%3A0000
 
 // Mistake erase other fields whiel trying to update data
 curl -X POST --data '[{"id":"00000002","title_txt_en":"This is another new title"}]' 'http://localhost:8983/solr/sandbox/update?commit=true'
-
+ 
 // Show Samuel Herbert
 curl http://localhost:8983/solr/sandbox/select?indent=true\&q.op=OR\&q=id%3A00000002
+
+// Delete Samuel Herbert
+curl 'http://localhost:8983/solr/sandbox/update?commit=true' --data '<delete><query>id:00000002</query></delete>' ;

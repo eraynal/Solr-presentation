@@ -1,0 +1,8 @@
+The process that Solr follows when a new document is ingested into Solr is more or less as follows:
+
+    If there is an exact match for a field being ingested and the fields defined in the schema then Solr will use the definition in the schema to ingest the data. This is what happened for the id field. Our JSON data has an id field and so does the schema, therefore Solr stored the id value in the id field as indicated in the schema (i.e. as single-value string.)
+
+    If there is no exact match in the schema then Solr will look at the dynamicFields definitions to see if the field can be handled with some predefined settings. This is what happened with the title_txt_en field. Because there is not title_txt_en definition in the schema Solr used the dynamic field definition for *_txt_en that indicated that the value should be indexed using the text in English (text_en) field definition.
+
+    If no match is found in the dynamic fields either Solr will guess what is the best type to use based on the data for this field in the first document. This is what happened with the subjects_txts_en field (notice that this field ends with _txts_en rather than _txt_en). In this case, since there is no dynamic field definition to handle this ending, Solr guessed and created field subjects_txts_en as text_general (and additionally created a string version subjects_txts_en_str of the field). For production use Solr recommends to disable this automatic guessing, this is what the "WARNING: Using _default configset with data driven schema functionality. NOT RECOMMENDED for production use" was about when we first created our Solr core.
+
