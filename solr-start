@@ -1,0 +1,5 @@
+echo "Import data"
+curl 'https://raw.githubusercontent.com/hectorcorrea/solr-for-newbies/master/books.json' > books.json ;
+
+echo "Run docker"
+docker run --name solr_pres -d -p 8983:8983 -t solr ;
