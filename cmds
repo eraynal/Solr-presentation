@@ -1,18 +1,18 @@
-// import data
+// Import data
 curl 'https://raw.githubusercontent.com/hectorcorrea/solr-for-newbies/master/books.json' > books.json ;
 
-// run docker and link to privileged volume
+// Run docker and link to privileged volume
 docker run --name solr_pres -d -p 8983:8983 -t solr ;
 
-// create core "sandbox"
+// Create core "sandbox"
 docker exec -it solr_pres bin/solr create_core -c sandbox ;
 // should be possible to do from http : https://cwiki.apache.org/confluence/display/solr/CoreAdmin#CREATE
 //curl http://localhost:8983/solr/admin/cores\?action\=CREATE\&name\=core_name\&numShards\=2\&replicationFactor\=2 
 
-// show cores
+// Show cores
 curl http://localhost:8983/solr/admin/cores\?action\=STATUS ;
 
-// Update data to solr
+// Push everything into solr (Update)
 curl 'http://localhost:8983/solr/sandbox/update?commit=true' --data-binary @books.json -H 'Content-type:application/json' ;
 
 // Read everything in a core
@@ -20,3 +20,29 @@ curl 'http://localhost:8983/solr/sandbox/select?q=*:*' ;
 
 // Delete everything in a core
 curl 'http://localhost:8983/solr/sandbox/update?commit=true' --data '<delete><query>*:*</query></delete>' ;
+
+
+
+
+// Deeper presentation
+// Push everything again
+curl 'http://localhost:8983/solr/sandbox/update?commit=true' --data-binary @books.json -H 'Content-type:application/json' ;
+
+// Mistake: Samuel Herbert wihtout quote
+curl http://localhost:8983/solr/sandbox/select?indent=true\&q.op=OR\&q=author_txt_en%3ASamuel%20Herbert
+
+// Show Samuel Herbert
+curl http://localhost:8983/solr/sandbox/select?indent=true\&q.op=OR\&q=author_txt_en%3A%22Samuel%20Herbert%22
+
+// Update
+// Update title atomic operation
+curl -X POST --data '[{"id":"00000002","title_txt_en":{"set":"This is a new title"}}]' 'http://localhost:8983/solr/sandbox/update?commit=true'
+
+// Show Samuel Herbert
+curl http://localhost:8983/solr/sandbox/select?indent=true\&q.op=OR\&q=id%3A00000002
+
+// Mistake erase other fields whiel trying to update data
+curl -X POST --data '[{"id":"00000002","title_txt_en":"This is another new title"}]' 'http://localhost:8983/solr/sandbox/update?commit=true'
+
+// Show Samuel Herbert
+curl http://localhost:8983/solr/sandbox/select?indent=true\&q.op=OR\&q=id%3A00000002
