@@ -25,33 +25,46 @@ curl 'http://localhost:8983/solr/sandbox/update?commit=true' --data '<delete><qu
 
 
 
-
-echo "Deeper presentation"
-echo "Push everything again"
-curl 'http://localhost:8983/solr/sandbox/update?commit=true' --data-binary @books.json -H 'Content-type:application/json' ;
-
-echo "Mistake: Samuel Herbert wihtout quote"
-curl http://localhost:8983/solr/sandbox/select?indent=true\&q.op=OR\&q=author_txt_en%3ASamuel%20Herbert
-
-echo "Show Samuel Herbert"
-curl http://localhost:8983/solr/sandbox/select?indent=true\&q.op=OR\&q=author_txt_en%3A%22Samuel%20Herbert%22
-
-echo "Update"
-echo "Update title atomic operation"
-curl -X POST --data '[{"id":"00000002","title_txt_en":{"set":"This is a new title"}}]' 'http://localhost:8983/solr/sandbox/update?commit=true'
-
-echo "Show Samuel Herbert"
-curl http://localhost:8983/solr/sandbox/select?indent=true\&q.op=OR\&q=id%3A00000002
-
-echo "Mistake erase other fields whiel trying to update data"
-curl -X POST --data '[{"id":"00000002","title_txt_en":"This is another new title"}]' 'http://localhost:8983/solr/sandbox/update?commit=true'
- 
-echo "Show Samuel Herbert"
-curl http://localhost:8983/solr/sandbox/select?indent=true\&q.op=OR\&q=id%3A00000002
-
-echo "Delete Samuel Herbert"
-curl 'http://localhost:8983/solr/sandbox/update?commit=true' --data '<delete><query>id:00000002</query></delete>' ;
+curl 'http://localhost:8983/solr/sandbox/update?commit=true' --data-binary @books.json -H 'Content-type:application/json';
 
 
-echo "Show matchs where subjects_txts_en=Geography and count results by publisher_txt_en with facet"
-curl http://localhost:8983/solr/sandbox/select?facet.field=publisher_txt_en&facet=true&indent=true&q.op=OR&q=subjects_txts_en%3AGeography
+curl 'http://localhost:8983/solr/sandbox/select?q=author_txt_en:"Samuel+Herbert"';
+curl 'http://localhost:8983/solr/sandbox/select?q=author_txt_en:Samuel+Herbert';
+
+curl 'http://localhost:8983/solr/sandbox/select?q=author_txt_en:Samuel+Herbert&start=10&rows=3';
+
+
+curl 'http://localhost:8983/solr/sandbox/select?q=author_txt_en:Samuel+Herbert&start=10&rows=3&fl=author_txt_en,title_txt_en';
+
+
+curl 'http://localhost:8983/solr/sandbox/select?q=authors_other_txts_en:*&fl=author_txt_en,title_txt_en,authors_other_txts_en&rows=3';
+
+curl 'http://localhost:8983/solr/sandbox/select?q=NOT+authors_other_txts_en:*&fl=author_txt_en,title_txt_en,authors_other_txts_en&rows=3';
+
+curl 'http://localhost:8983/solr/sandbox/select?q=author_txt_en:A*&rows=3&fl=author_txt_en';
+
+curl 'http://localhost:8983/solr/sandbox/select?q=author_txt_en:A*+AND+subjects_txts_en:Homeopathy&rows=3&fl=author_txt_en,subjects_txts_en';
+
+curl 'http://localhost:8983/solr/sandbox/select?q=author_txt_en:A*+OR+subjects_txts_en:Homeopathy&rows=3&fl=author_txt_en,subjects_txts_en';
+
+curl 'http://localhost:8983/solr/sandbox/select?q=author_txt_en:A*&fq=subjects_txts_en:Homeopathy&rows=3&fl=author_txt_en,subjects_txts_en';
+
+
+# defType:lucene, dismax and edismax
+
+curl 'http://localhost:8983/solr/sandbox/select?q="george+washington"&qf=title_txt_en+author_txt_en&defType=edismax';
+
+curl 'http://localhost:8983/solr/sandbox/select?q=school+teachers+secondary+classroom&qf=title_txt_en&mm=3<50%25&defType=edismax&fl=id,title_txt_en';
+
+
+
+curl 'http://localhost:8983/solr/sandbox/select?facet.field=publisher_txt_en&facet=true&q=subjects_txts_en:Geography&fl=id,title_txt_en&rows=3';
+
+
+
+curl 'http://localhost:8983/solr/sandbox/select?q=id:00000002';
+
+curl -X POST --data '[{"id":"00000002","title_txt_en":{"set":"This is a new title"}}]' 'http://localhost:8983/solr/sandbox/update?commit=true';
+
+curl 'http://localhost:8983/solr/sandbox/select?q=id:00000002';
+
