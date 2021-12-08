@@ -18,8 +18,6 @@ curl 'http://localhost:8983/solr/sandbox/select?q=author_txt_en:A*&rows=3&fl=aut
 
 curl 'http://localhost:8983/solr/sandbox/select?q=author_txt_en:A*+AND+subjects_txts_en:Homeopathy&rows=3&fl=author_txt_en,subjects_txts_en'
 
-curl 'http://localhost:8983/solr/sandbox/select?q=author_txt_en:A*+AND+subjects_txts_en:homeopathy&rows=3&fl=author_txt_en,subjects_txts_en'
-
 curl 'http://localhost:8983/solr/sandbox/select?q=author_txt_en:A*+OR+subjects_txts_en:Homeopathy&rows=3&fl=author_txt_en,subjects_txts_en'
 
 curl 'http://localhost:8983/solr/sandbox/select?q=author_txt_en:A*&fq=subjects_txts_en:Homeopathy&rows=3&fl=author_txt_en,subjects_txts_en'
@@ -46,7 +44,3 @@ curl 'http://localhost:8983/solr/sandbox/select?q=id:00000002'
 curl -X POST --data '[{"id":"00000002","title_txt_en":"This is another new title"}]' 'http://localhost:8983/solr/sandbox/update?commit=true'
  
 curl 'http://localhost:8983/solr/sandbox/select?q=id:00000002'
-
-curl 'http://localhost:8983/solr/sandbox/update?commit=true' --data '<delete><query>id:00000002</query></delete>'
-
-
